@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="jquery.csv.js"></script>
+<script>
+$(document).ready(function(){
+
+  var plans;
+  var zips;
+
+
+  //Convert PLANS.CSV to array
+	$.ajax({
+	  type: "GET",  
+	  url: "plans.csv",
+	  dataType: "text",
+    async: false,       
+	  success: function(response)  
+	  {
+		data = $.csv.toArrays(response);
+      plans = data;
+		  //populate_table(data);
+	  }   
+
+	});
+
+  //Convert ZIPS.CSV to array
+	$.ajax({
+	  type: "GET",  
+	  url: "zips.csv",
+	  dataType: "text",
+    async: false,       
+	  success: function(response)  
+	  {
+		data = $.csv.toArrays(response);
+      zips = data;
+	  }   
+
+	});
+
+  function populate_table(data){
+    //console.log(data);
+    plans = data;
+    $( "#plans_data" ).append(plans);
+
+  }
+  //console.log(plans);
+
+
+  //print data to test
+  text = "<table><tr><td>PLANS</td><td>ZIPS</td></tr><tr><td valign=top>"
+  text += "<ul>";
+    for (let i = 0; i < plans.length; i++) {
+      text += "<li>" + plans[i] + "</li>";
+      }
+    text += "</ul>";
+
+  text += "</td><td valign=top><ul>";
+    for (let i = 0; i < zips.length; i++) {
+      text += "<li>" + zips[i] + "</li>";
+      }
+    text += "</ul></td></tr></table>";
+
+
+    $( "#plans_data" ).append(text);
+  
+
+    //prints entire list
+    console.log(plans[1]); 
+
+    //prints specific key, value
+    console.log(plans[1][0]);
+    console.log(plans[1][1]);
+    console.log(plans[1][2]);
+    console.log(plans[1][3]);
+    console.log(plans[1][4]);
+
+});
+</script>
+</head>
+<body>
+
+<div id="plans_data">
+  </div>
+
+</body>
+</html>
