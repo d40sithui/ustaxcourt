@@ -8,7 +8,8 @@ $(document).ready(function(){
 
   var plans;
   var zips;
-  var silverPlans = new Array();
+  var silverPlans = new Array(); //stores only silver plans
+  var slcsp =  new Array(); //stores the second lowest rate per rate_area
 
 
   /* ***************************
@@ -59,8 +60,47 @@ $(document).ready(function(){
 
   
   /* ***************************
-  create an array with unique zip
+  find second lowest rate for each silver plan per state code and rate_area
   **************************** */
+ for (i =0; i < silverPlans.length; ++i){
+   var subSlcsp = new Array();
+   var k = 0;
+   var smallest;
+   var secondSmallest;
+
+   for(j =0; j < silverPlans.length; j++){
+
+      if (i != j){ //dont run if we are matching the same item
+        //finds common all states and rate_area and adds them to a temp array
+        if(silverPlans[i][1] == silverPlans[j][1] && silverPlans[i][4] == silverPlans[j][4]){
+          subSlcsp[k][0] = silverPlans[i][0]; //plan_id
+          subSlcsp[k][1] = silverPlans[i][1]; //state
+          subSlcsp[k][2] = silverPlans[i][3]; //rate
+          k++;
+        }
+      }
+   } //ends for(j)
+
+   console.log(subSlcsp);
+  
+   /*
+   //find the smallest rate
+   if(subSlcsp.length < 1){
+     secondSmallest = null;
+   }
+
+   else if(subSlcsp.length==1){
+     secondSmallest = subSlcsp[0][2];
+   }
+   else if(subSlcsp.length>1){
+    for(l=0;l < subSlcsp.length; ++l){
+
+    }
+  }
+
+  */
+
+ }
 
 
   //print data to test
@@ -87,23 +127,23 @@ $(document).ready(function(){
   
 
     //prints entire list for PLANS
-    console.log(plans[1]); 
+    //console.log(plans[1]); 
 
     //prints specific key, value
-    console.log(plans[1][0]); //plan_id
-    console.log(plans[1][1]); //state
-    console.log(plans[1][2]); //metal_level
-    console.log(plans[1][3]); //rate
-    console.log(plans[1][4]); //rate_area
+    //console.log(plans[1][0]); //plan_id
+    //console.log(plans[1][1]); //state
+    //console.log(plans[1][2]); //metal_level
+    //console.log(plans[1][3]); //rate
+    //console.log(plans[1][4]); //rate_area
 
     //prints entire list for ZIPs
-    console.log(zips[1]);
+    //console.log(zips[1]);
 
-    console.log(zips[1][0]); //zip_code
-    console.log(zips[1][1]); //state
-    console.log(zips[1][2]); //county_code
-    console.log(zips[1][3]); //name
-    console.log(zips[1][4]); //rate_area
+    //console.log(zips[1][0]); //zip_code
+    //console.log(zips[1][1]); //state
+    //console.log(zips[1][2]); //county_code
+    //console.log(zips[1][3]); //name
+    //console.log(zips[1][4]); //rate_area
 
     //console.log(plans);
 
