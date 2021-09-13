@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <style>
+    #plans{
+      display:none;
+    }
+
+    #zips{
+      display:none;
+    }
+
+    #silver{
+      display:none;
+    }
+  </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="jquery.csv.js"></script>
 <script>
 $(document).ready(function(){
 
-  var plans;
-  var zips;
-  var silverPlans = new Array(); //stores only silver plans
-  var slcsp =  new Array(); //stores the second lowest rate per rate_area
+
+  //global vars
+  var plans = [];
+  var zips = [];
+  var silverPlans = []; //stores only silver plans
+  var slcsp =  []; 
 
 
   /* ***************************
@@ -17,7 +32,8 @@ $(document).ready(function(){
   **************************** */
 	$.ajax({
 	  type: "GET",  
-	  url: "plans.csv",
+	  //url: "plansSample.csv",
+    url: "plans.csv",
 	  dataType: "text",
     async: false,       
 	  success: function(response)  
@@ -33,7 +49,8 @@ $(document).ready(function(){
   **************************** */
 	$.ajax({
 	  type: "GET",  
-	  url: "zips.csv",
+	  //url: "zipsSample.csv",
+    url: "zips.csv",
 	  dataType: "text",
     async: false,       
 	  success: function(response)  
@@ -43,6 +60,23 @@ $(document).ready(function(){
 	  }   
 
 	});
+
+  /* ****************************
+  Converts slcsp.csv to array
+  ***************************** */
+	$.ajax({
+	  type: "GET",  
+    url: "slcsp.csv",
+	  dataType: "text",
+    async: false,       
+	  success: function(response)  
+	  {
+		data = $.csv.toArrays(response);
+      slcsp = data;
+	  }   
+
+	});
+
 
   /* ***************************
   Filter to only Silver plans
@@ -62,69 +96,122 @@ $(document).ready(function(){
   /* ***************************
   find second lowest rate for each silver plan per state code and rate_area
   **************************** */
+ 
  for (i =0; i < silverPlans.length; ++i){
-   var subSlcsp = new Array();
+   var subarr = [];
    var k = 0;
    var smallest;
    var secondSmallest;
 
-   for(j =0; j < silverPlans.length; j++){
+   for(j =0; j < silverPlans.length; ++j){
 
-      if (i != j){ //dont run if we are matching the same item
+      //if (i != j){ //dont run if we are matching the same item
         //finds common all states and rate_area and adds them to a temp array
         if(silverPlans[i][1] == silverPlans[j][1] && silverPlans[i][4] == silverPlans[j][4]){
-          subSlcsp[k][0] = silverPlans[i][0]; //plan_id
-          subSlcsp[k][1] = silverPlans[i][1]; //state
-          subSlcsp[k][2] = silverPlans[i][3]; //rate
+          subarr[k] = []; //define as an array, otherwise we will get undefined
+          subarr[k].push(silverPlans[j][0]); //plan_id
+          subarr[k].push(silverPlans[j][1]); //state
+          subarr[k].push(silverPlans[j][3]); //rate
+          subarr[k].push(silverPlans[j][4]); //rate_area
           k++;
         }
-      }
+      //}
    } //ends for(j)
 
-   console.log(subSlcsp);
+   
+   console.log(subarr);
+
+   
+
+   
+   //gets the smallest, and second smallest
   
-   /*
-   //find the smallest rate
-   if(subSlcsp.length < 1){
-     secondSmallest = null;
+   let first = 999;
+   let second = 999;
+   //let a = 0;
+
+   for (a=0; a < subarr.length; ++a){
+
+    //if rate is less than first
+     if(subarr[a][2] < first){
+       second = first;
+       first = subarr[a][2];
+     }
+
+    //if rate is between first and second
+     else if (subarr[a][2] < second && subarr[a][2] != first){
+       second = subarr[a][2];
+     }
    }
 
-   else if(subSlcsp.length==1){
-     secondSmallest = subSlcsp[0][2];
-   }
-   else if(subSlcsp.length>1){
-    for(l=0;l < subSlcsp.length; ++l){
+   console.log("first: "+first);
+   console.log("second: "+second);
 
+
+   //append the second lowest value to the zips array
+  
+  for (a = 0; a < zips.length; a++){
+    if(zips[a][1] == subarr[0][1] && zips[a][4] == subarr[0][3]){
+      zips[a][5] = second;
     }
   }
 
-  */
 
- }
+ }//ends for (i) 
+ 
+ console.log("plans type:" + typeof plans)
+ console.log("zips type:" + typeof zips)
 
+  console.log("silverPlans type:" + typeof silverPlans)
 
   //print data to test
-  text = "<table><tr><td>PLANS</td><td>ZIPS</td><td>silverPlans</td></tr><tr><td valign=top>"
-  text += "<ul>";
+  text = "<table><tr><td>PLANS</td><td>ZIPS</td><td>silverPlans</td></tr><tr><td valign=top><ul id=\"plans\"></ul></td>";
+  text += "<td valign=top><ul id=\"zips\"></ul></td>";
+  text += "<td valign=top><ul id=\"silver\"></ul></td>";
+  text +="</tr></table>";
+  $( "#plans_data" ).html(text);
+
+
+  text = "";
     for (let i = 0; i < plans.length; i++) {
       text += "<li>" + plans[i] + "</li>";
       }
-    text += "</ul>";
+    
+    $("#plans" ).html(text);
+    $("#plans").fadeIn(5000); 
 
-  text += "</td><td valign=top><ul>";
+    //$("#plans").html(text, function(){
+     // $("#plans").fadeIn(5000)
+   // });
+    //$("#plans").fadeIn(5000, function(){
+      //$("#plans").html(text)
+    //});
+    
+
+    //$("#plans").fadeIn('slow', function() {
+    // will be called when the element finishes fading out
+    // if selector matches multiple elements it will be called once for each
+    //});
+  
+
+
+  text = "";
     for (let i = 0; i < zips.length; i++) {
       text += "<li>" + zips[i] + "</li>";
       }
+      $("#zips").html(text);
+      $("#zips").fadeIn(5000); 
 
-  text += "</ul></td><td valign=top><ul>";
+
+
+  text = "";
     for (i = 0; i < silverPlans.length; ++i) {
       text += "<li>" +silverPlans[i]+"</li>";
     }
-    text += "</ul></td></tr></table>";
 
 
-    $( "#plans_data" ).append(text);
-  
+    $("#silver").html(text);
+    $("#silver").fadeIn(5000);
 
     //prints entire list for PLANS
     //console.log(plans[1]); 
@@ -146,6 +233,8 @@ $(document).ready(function(){
     //console.log(zips[1][4]); //rate_area
 
     //console.log(plans);
+
+  
 
 });
 </script>
