@@ -10,7 +10,7 @@
       display:none;
     }
 
-    #silver{
+    #silver, #slscp{
       display:none;
     }
   </style>
@@ -90,13 +90,15 @@ $(document).ready(function(){
     }
   }
 
-  //plans.splice(0,1);
+  //plans.splice(0,1); //splice reindexes the array, so we might not want this.
 
   
   /* ***************************
   find second lowest rate for each silver plan per state code and rate_area
   **************************** */
  
+
+  //begin by creating a temp array to store all rates, by rate area and state
  for (i =0; i < silverPlans.length; ++i){
    var subarr = [];
    var k = 0;
@@ -118,18 +120,19 @@ $(document).ready(function(){
       //}
    } //ends for(j)
 
-   
+   //TESTING
    console.log(subarr);
 
    
 
    
-   //gets the smallest, and second smallest
+   
   
    let first = 999;
    let second = 999;
    //let a = 0;
 
+  //gets the smallest, and second smallest
    for (a=0; a < subarr.length; ++a){
 
     //if rate is less than first
@@ -144,12 +147,12 @@ $(document).ready(function(){
      }
    }
 
+  //TESTING
    console.log("first: "+first);
    console.log("second: "+second);
 
 
    //append the second lowest value to the zips array
-  
   for (a = 0; a < zips.length; a++){
     if(zips[a][1] == subarr[0][1] && zips[a][4] == subarr[0][3]){
       zips[a][5] = second;
@@ -158,6 +161,30 @@ $(document).ready(function(){
 
 
  }//ends for (i) 
+
+ 
+ //update the slcsp array 
+for (i = 0; i< slcsp.length; i++){
+  var count = 0; //have many times a zip is matched
+  var rate;
+  for (j = 0; j < zips.length; j++){
+    //if zip matches
+    if(slcsp[i][0] == zips[j][0]){
+        count++;
+        rate = zips[j][5];
+    }
+  }
+
+  //if only one zip is matched
+  if (count == 1){
+    slcsp[i][1] = rate;
+  }
+  else if (count > 1){
+    slcsp[i][1] = "Ambiguous";
+  }
+}
+
+
  
  console.log("plans type:" + typeof plans)
  console.log("zips type:" + typeof zips)
@@ -165,9 +192,10 @@ $(document).ready(function(){
   console.log("silverPlans type:" + typeof silverPlans)
 
   //print data to test
-  text = "<table><tr><td>PLANS</td><td>ZIPS</td><td>silverPlans</td></tr><tr><td valign=top><ul id=\"plans\"></ul></td>";
+  text = "<table><tr><td>PLANS</td><td>ZIPS</td><td>silverPlans</td><td>SLCSP</td></tr><tr><td valign=top><ul id=\"plans\"></ul></td>";
   text += "<td valign=top><ul id=\"zips\"></ul></td>";
   text += "<td valign=top><ul id=\"silver\"></ul></td>";
+  text += "<td valign=top><ul id=\"slcsp\"></ul></td>";
   text +="</tr></table>";
   $( "#plans_data" ).html(text);
 
@@ -212,6 +240,16 @@ $(document).ready(function(){
 
     $("#silver").html(text);
     $("#silver").fadeIn(5000);
+
+
+    text = "";
+    for (i = 0; i < slcsp.length; ++i) {
+      text += "<li>" +slcsp[i]+"</li>";
+    }
+
+
+    $("#slcsp").html(text);
+    $("#slcsp").fadeIn(5000);
 
     //prints entire list for PLANS
     //console.log(plans[1]); 
